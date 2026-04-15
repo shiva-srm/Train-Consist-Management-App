@@ -1,63 +1,63 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-// Simple class to represent a Goods Bogie for this UC
-class GoodsBogie {
-    String type; // e.g., "Cylindrical", "Rectangular"
-    String cargo; // e.g., "Petroleum", "Coal", "Chemicals"
+class Bogie {
+    int id;
+    int capacity;
 
-    public GoodsBogie(String type, String cargo) {
-        this.type = type;
-        this.cargo = cargo;
+    public Bogie(int id, int capacity) {
+        this.id = id;
+        this.capacity = capacity;
     }
 
-    public String getType() { return type; }
-    public String getCargo() { return cargo; }
+    public int getCapacity() { return capacity; }
 }
 
 public class TrainConsistApp {
 
     public static void main(String[] args) {
-        // Step 1: Create a list of goods bogies (Simulating a train consist)
-        List<GoodsBogie> consist = new ArrayList<>();
-        consist.add(new GoodsBogie("Rectangular", "Coal"));
-        consist.add(new GoodsBogie("Cylindrical", "Petroleum"));
-        consist.add(new GoodsBogie("Rectangular", "Iron Ore"));
-        consist.add(new GoodsBogie("Cylindrical", "Petroleum"));
+        // 1. Prepare a large dataset (e.g., 100,000 bogies)
+        List<Bogie> trainConsist = new ArrayList<>();
+        for (int i = 0; i < 100000; i++) {
+            trainConsist.add(new Bogie(i, (int) (Math.random() * 100)));
+        }
 
-        System.out.println("--- Train Consist Management System: UC12 (Safety Check) ---");
+        System.out.println("--- UC13: Performance Benchmarking (Loops vs Streams) ---");
+        System.out.println("Total Bogies to Process: " + trainConsist.size());
+        System.out.println("Filtering Criteria: Capacity > 60\n");
 
-        // Step 2: Use Streams to validate safety rules
-        // Rule: If type is "Cylindrical", cargo must be "Petroleum"
-        boolean isSafe = consist.stream().allMatch(bogie -> {
-            if (bogie.getType().equalsIgnoreCase("Cylindrical")) {
-                return bogie.getCargo().equalsIgnoreCase("Petroleum");
+        // 2. Benchmark Loop-Based Filtering
+        long startTimeLoop = System.nanoTime();
+        List<Bogie> filteredWithLoop = new ArrayList<>();
+        for (Bogie b : trainConsist) {
+            if (b.getCapacity() > 60) {
+                filteredWithLoop.add(b);
             }
-            return true; // Non-cylindrical bogies pass this specific safety check
-        });
+        }
+        long endTimeLoop = System.nanoTime();
+        long durationLoop = endTimeLoop - startTimeLoop;
 
-        // Step 3: Display Results
-        displaySafetyStatus(isSafe);
+        System.out.println("Traditional Loop Result Count: " + filteredWithLoop.size());
+        System.out.println("Traditional Loop Time: " + durationLoop + " ns");
 
-        // Scenario 2: Unsafe Train
-        System.out.println("\nAdding unsafe bogie (Cylindrical with Coal)...");
-        consist.add(new GoodsBogie("Cylindrical", "Coal"));
+        // 3. Benchmark Stream-Based Filtering
+        long startTimeStream = System.nanoTime();
+        List<Bogie> filteredWithStream = trainConsist.stream()
+                .filter(b -> b.getCapacity() > 60)
+                .collect(Collectors.toList());
+        long endTimeStream = System.nanoTime();
+        long durationStream = endTimeStream - startTimeStream;
 
-        boolean isSafeAfterViolation = consist.stream().allMatch(bogie ->
-                !bogie.getType().equalsIgnoreCase("Cylindrical") ||
-                        bogie.getCargo().equalsIgnoreCase("Petroleum")
-        );
+        System.out.println("\nStream API Result Count: " + filteredWithStream.size());
+        System.out.println("Stream API Time: " + durationStream + " ns");
 
-        displaySafetyStatus(isSafeAfterViolation);
-    }
-
-    private static void displaySafetyStatus(boolean isSafe) {
-        if (isSafe) {
-            System.out.println("✅ SAFETY COMPLIANCE: PASSED");
-            System.out.println("Result: The train formation is safe for departure.");
+        // 4. Comparison Summary
+        System.out.println("\n--- Analysis ---");
+        if (durationLoop < durationStream) {
+            System.out.println("Result: Traditional Loop was faster by " + (durationStream - durationLoop) + " ns.");
         } else {
-            System.out.println("❌ SAFETY COMPLIANCE: FAILED");
-            System.out.println("Result: Hazard detected! Cylindrical bogies must only carry Petroleum.");
+            System.out.println("Result: Stream API was faster by " + (durationLoop - durationStream) + " ns.");
         }
     }
 }
