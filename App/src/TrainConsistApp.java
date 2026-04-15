@@ -1,46 +1,59 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class TrainConsistApp {
 
     public static void main(String[] args) {
-        // Step 1: Initialize an array of Bogie IDs (Unsorted)
-        String[] bogieIds = {"BG101", "BG205", "BG309", "BG412", "BG550"};
-
+        // Step 1: Input data (may be unsorted)
+        String[] bogieIds = {"BG309", "BG101", "BG550", "BG205", "BG412"};
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("--- UC18: Linear Search (Bogie Identification) ---");
-        System.out.println("Available Bogies: [BG101, BG205, BG309, BG412, BG550]");
+        System.out.println("--- UC19: Binary Search (Optimized Lookup) ---");
 
-        // Step 2: Accept a search key from the user
-        System.out.print("Enter Bogie ID to search: ");
+        // Step 2: Precondition - Data MUST be sorted for Binary Search
+        Arrays.sort(bogieIds);
+        System.out.println("Sorted Bogies for Search: " + Arrays.toString(bogieIds));
+
+        System.out.print("Enter Bogie ID to find: ");
         String searchKey = scanner.nextLine();
 
-        // Step 3: Execute Linear Search
-        int resultIndex = linearSearch(bogieIds, searchKey);
+        // Step 3: Execute Binary Search
+        int resultIndex = binarySearch(bogieIds, searchKey);
 
-        // Step 4: Display Result
+        // Step 4: Display Results
         if (resultIndex != -1) {
-            System.out.println("✔ Found: Bogie " + searchKey + " is located at position " + (resultIndex + 1) + ".");
+            System.out.println("✔ Found: Bogie " + searchKey + " is at index " + resultIndex);
         } else {
-            System.out.println("❌ Not Found: Bogie " + searchKey + " is not in the consist.");
+            System.out.println("❌ Not Found: Bogie " + searchKey + " does not exist in the consist.");
         }
 
-        System.out.println("--------------------------------------------------");
         scanner.close();
     }
 
     /**
-     * Performs a Linear Search to find a Bogie ID.
-     * @return index of the found ID, or -1 if not found.
+     * Optimized Binary Search implementation for String IDs
      */
-    public static int linearSearch(String[] array, String key) {
-        // Sequential Traversal: Visit every element from index 0 to N-1
-        for (int i = 0; i < array.length; i++) {
-            // Equality Comparison using .equals() for Strings
-            if (array[i].equalsIgnoreCase(key)) {
-                return i; // Early Termination: Stop as soon as a match is found
+    public static int binarySearch(String[] array, String key) {
+        int low = 0;
+        int high = array.length - 1;
+
+        while (low <= high) {
+            // Find the middle point
+            int mid = low + (high - low) / 2;
+
+            // Compare the key with the middle element
+            int comparison = key.compareTo(array[mid]);
+
+            if (comparison == 0) {
+                return mid; // Match found!
+            }
+            else if (comparison > 0) {
+                low = mid + 1; // Key is in the right half
+            }
+            else {
+                high = mid - 1; // Key is in the left half
             }
         }
-        return -1; // Match Not Found after full traversal
+        return -1; // Exhausted search range without a match
     }
 }
