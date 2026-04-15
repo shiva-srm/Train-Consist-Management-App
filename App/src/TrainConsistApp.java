@@ -1,50 +1,63 @@
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
+
+// Simple class to represent a Goods Bogie for this UC
+class GoodsBogie {
+    String type; // e.g., "Cylindrical", "Rectangular"
+    String cargo; // e.g., "Petroleum", "Coal", "Chemicals"
+
+    public GoodsBogie(String type, String cargo) {
+        this.type = type;
+        this.cargo = cargo;
+    }
+
+    public String getType() { return type; }
+    public String getCargo() { return cargo; }
+}
 
 public class TrainConsistApp {
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        // Step 1: Create a list of goods bogies (Simulating a train consist)
+        List<GoodsBogie> consist = new ArrayList<>();
+        consist.add(new GoodsBogie("Rectangular", "Coal"));
+        consist.add(new GoodsBogie("Cylindrical", "Petroleum"));
+        consist.add(new GoodsBogie("Rectangular", "Iron Ore"));
+        consist.add(new GoodsBogie("Cylindrical", "Petroleum"));
 
-        // Define Regex Patterns
-        // TRN- followed by exactly 4 digits
-        String trainIdRegex = "TRN-\\d{4}";
-        // PET- followed by exactly 2 uppercase letters
-        String cargoCodeRegex = "PET-[A-Z]{2}";
+        System.out.println("--- Train Consist Management System: UC12 (Safety Check) ---");
 
-        System.out.println("--- Train Consist Management System: UC11 (Regex Validation) ---");
+        // Step 2: Use Streams to validate safety rules
+        // Rule: If type is "Cylindrical", cargo must be "Petroleum"
+        boolean isSafe = consist.stream().allMatch(bogie -> {
+            if (bogie.getType().equalsIgnoreCase("Cylindrical")) {
+                return bogie.getCargo().equalsIgnoreCase("Petroleum");
+            }
+            return true; // Non-cylindrical bogies pass this specific safety check
+        });
 
-        // 1. Train ID Validation
-        System.out.print("Enter Train ID (Format: TRN-1234): ");
-        String trainIdInput = scanner.nextLine();
-        validateInput("Train ID", trainIdInput, trainIdRegex);
+        // Step 3: Display Results
+        displaySafetyStatus(isSafe);
 
-        // 2. Cargo Code Validation
-        System.out.print("Enter Cargo Code (Format: PET-AB): ");
-        String cargoCodeInput = scanner.nextLine();
-        validateInput("Cargo Code", cargoCodeInput, cargoCodeRegex);
+        // Scenario 2: Unsafe Train
+        System.out.println("\nAdding unsafe bogie (Cylindrical with Coal)...");
+        consist.add(new GoodsBogie("Cylindrical", "Coal"));
 
-        System.out.println("-------------------------------------------------------------");
-        scanner.close();
+        boolean isSafeAfterViolation = consist.stream().allMatch(bogie ->
+                !bogie.getType().equalsIgnoreCase("Cylindrical") ||
+                        bogie.getCargo().equalsIgnoreCase("Petroleum")
+        );
+
+        displaySafetyStatus(isSafeAfterViolation);
     }
 
-    /**
-     * Helper method to validate input against a regex pattern
-     */
-    public static void validateInput(String fieldName, String input, String regex) {
-        // Compile the regex pattern
-        Pattern pattern = Pattern.compile(regex);
-
-        // Create a matcher for the specific input
-        Matcher matcher = pattern.matcher(input);
-
-        // Check if the entire input matches the pattern
-        if (matcher.matches()) {
-            System.out.println("✔ [SUCCESS] " + fieldName + " '" + input + "' is valid.");
+    private static void displaySafetyStatus(boolean isSafe) {
+        if (isSafe) {
+            System.out.println("✅ SAFETY COMPLIANCE: PASSED");
+            System.out.println("Result: The train formation is safe for departure.");
         } else {
-            System.out.println("❌ [ERROR] " + fieldName + " '" + input + "' is invalid.");
-            System.out.println("   Rule: Must follow the pattern: " + regex);
+            System.out.println("❌ SAFETY COMPLIANCE: FAILED");
+            System.out.println("Result: Hazard detected! Cylindrical bogies must only carry Petroleum.");
         }
     }
 }
