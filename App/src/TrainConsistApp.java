@@ -3,46 +3,30 @@ import java.util.Arrays;
 public class TrainConsistApp {
 
     public static void main(String[] args) {
-        // Step 1: Initialize an array of passenger bogie capacities
-        int[] capacities = {72, 56, 24, 70, 60};
+        // Step 1: Initialize an array of bogie type names
+        String[] bogieNames = {
+                "Sleeper",
+                "AC Chair",
+                "First Class",
+                "General",
+                "Luxury"
+        };
 
-        System.out.println("--- UC16: Manual Sorting (Bubble Sort Algorithm) ---");
-        System.out.println("Original Capacities: " + Arrays.toString(capacities));
+        System.out.println("--- UC17: Library-Based Sorting (Arrays.sort) ---");
+        System.out.println("Before Sorting: " + Arrays.toString(bogieNames));
 
-        // Step 2: Implement Bubble Sort Algorithm
-        bubbleSort(capacities);
+        // Step 2: Use Java's built-in sorting utility
+        // Strings are sorted in their "Natural Order" (Alphabetical)
+        Arrays.sort(bogieNames);
 
-        // Step 3: Display Sorted Result
-        System.out.println("Sorted Capacities:   " + Arrays.toString(capacities));
-        System.out.println("----------------------------------------------------");
-    }
+        // Step 3: Display the sorted result
+        System.out.println("After Sorting:  " + Arrays.toString(bogieNames));
 
-    /**
-     * Sorts an array using the Bubble Sort technique.
-     * Compares adjacent elements and swaps them if they are in the wrong order.
-     */
-    public static void bubbleSort(int[] array) {
-        int n = array.length;
-        boolean swapped;
+        // Demonstrating duplicate handling
+        String[] duplicateConsist = {"Sleeper", "AC Chair", "Sleeper", "General"};
+        Arrays.sort(duplicateConsist);
+        System.out.println("\nSorted with Duplicates: " + Arrays.toString(duplicateConsist));
 
-        // Outer loop: controls the number of passes
-        for (int i = 0; i < n - 1; i++) {
-            swapped = false;
-
-            // Inner loop: compares adjacent elements
-            // The last i elements are already in place after i passes
-            for (int j = 0; j < n - i - 1; j++) {
-                if (array[j] > array[j + 1]) {
-                    // Swap Logic: Use a temporary variable to exchange values
-                    int temp = array[j];
-                    array[j] = array[j + 1];
-                    array[j + 1] = temp;
-                    swapped = true;
-                }
-            }
-
-            // Optimization: If no two elements were swapped in the inner loop, the array is sorted
-            if (!swapped) break;
-        }
+        System.out.println("-------------------------------------------------");
     }
 }
