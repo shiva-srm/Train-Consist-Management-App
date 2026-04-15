@@ -1,67 +1,48 @@
-import java.util.Scanner;
-
-// 1. Custom Runtime Exception
-class CargoSafetyException extends RuntimeException {
-    public CargoSafetyException(String message) {
-        super(message);
-    }
-}
-
-class GoodsBogie {
-    private String shape; // "Cylindrical" or "Rectangular"
-    private String currentCargo = "Empty";
-
-    public GoodsBogie(String shape) {
-        this.shape = shape;
-    }
-
-    // Method to assign cargo with safety logic
-    public void assignCargo(String cargo) {
-        System.out.println(">>> System: Validating assignment of " + cargo + " to " + shape + " bogie.");
-
-        // Safety Rule: Petroleum MUST NOT go in Rectangular bogies
-        if (shape.equalsIgnoreCase("Rectangular") && cargo.equalsIgnoreCase("Petroleum")) {
-            throw new CargoSafetyException("SAFETY VIOLATION: Petroleum requires specialized Cylindrical bogies!");
-        }
-
-        this.currentCargo = cargo;
-        System.out.println("✔ Assignment Successful.");
-    }
-
-    @Override
-    public String toString() {
-        return "Bogie[Shape=" + shape + ", Cargo=" + currentCargo + "]";
-    }
-}
+import java.util.Arrays;
 
 public class TrainConsistApp {
+
     public static void main(String[] args) {
-        GoodsBogie rectangularBogie = new GoodsBogie("Rectangular");
+        // Step 1: Initialize an array of passenger bogie capacities
+        int[] capacities = {72, 56, 24, 70, 60};
 
-        System.out.println("--- UC15: Safe Cargo Assignment (try-catch-finally) ---");
+        System.out.println("--- UC16: Manual Sorting (Bubble Sort Algorithm) ---");
+        System.out.println("Original Capacities: " + Arrays.toString(capacities));
 
-        // Scenario: Attempting unsafe assignment
-        processAssignment(rectangularBogie, "Petroleum");
+        // Step 2: Implement Bubble Sort Algorithm
+        bubbleSort(capacities);
 
-        System.out.println();
-
-        // Scenario: Attempting safe assignment
-        processAssignment(rectangularBogie, "Coal");
-
-        System.out.println("\nFinal State: " + rectangularBogie);
-        System.out.println("-------------------------------------------------------");
+        // Step 3: Display Sorted Result
+        System.out.println("Sorted Capacities:   " + Arrays.toString(capacities));
+        System.out.println("----------------------------------------------------");
     }
 
-    public static void processAssignment(GoodsBogie bogie, String cargo) {
-        try {
-            bogie.assignCargo(cargo);
-        } catch (CargoSafetyException e) {
-            // Handle the runtime error gracefully
-            System.out.println("❌ ERROR CAUGHT: " + e.getMessage());
-            System.out.println("Action: Cargo rejected. Alerting logistics manager.");
-        } finally {
-            // Mandatory logic that always runs (logging/cleanup)
-            System.out.println("[LOG]: Cargo validation cycle completed.");
+    /**
+     * Sorts an array using the Bubble Sort technique.
+     * Compares adjacent elements and swaps them if they are in the wrong order.
+     */
+    public static void bubbleSort(int[] array) {
+        int n = array.length;
+        boolean swapped;
+
+        // Outer loop: controls the number of passes
+        for (int i = 0; i < n - 1; i++) {
+            swapped = false;
+
+            // Inner loop: compares adjacent elements
+            // The last i elements are already in place after i passes
+            for (int j = 0; j < n - i - 1; j++) {
+                if (array[j] > array[j + 1]) {
+                    // Swap Logic: Use a temporary variable to exchange values
+                    int temp = array[j];
+                    array[j] = array[j + 1];
+                    array[j + 1] = temp;
+                    swapped = true;
+                }
+            }
+
+            // Optimization: If no two elements were swapped in the inner loop, the array is sorted
+            if (!swapped) break;
         }
     }
 }
