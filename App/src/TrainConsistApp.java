@@ -1,59 +1,49 @@
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TrainConsistApp {
 
     public static void main(String[] args) {
-        // Step 1: Input data (may be unsorted)
-        String[] bogieIds = {"BG309", "BG101", "BG550", "BG205", "BG412"};
-        Scanner scanner = new Scanner(System.in);
+        // Scenario 1: Empty Train (State Violation)
+        List<String> emptyConsist = new ArrayList<>();
+        System.out.println("--- UC20: Defensive Programming (State Validation) ---");
+        System.out.println("Scenario 1: Searching an empty train consist...");
 
-        System.out.println("--- UC19: Binary Search (Optimized Lookup) ---");
-
-        // Step 2: Precondition - Data MUST be sorted for Binary Search
-        Arrays.sort(bogieIds);
-        System.out.println("Sorted Bogies for Search: " + Arrays.toString(bogieIds));
-
-        System.out.print("Enter Bogie ID to find: ");
-        String searchKey = scanner.nextLine();
-
-        // Step 3: Execute Binary Search
-        int resultIndex = binarySearch(bogieIds, searchKey);
-
-        // Step 4: Display Results
-        if (resultIndex != -1) {
-            System.out.println("✔ Found: Bogie " + searchKey + " is at index " + resultIndex);
-        } else {
-            System.out.println("❌ Not Found: Bogie " + searchKey + " does not exist in the consist.");
+        try {
+            performSearch(emptyConsist, "BG101");
+        } catch (IllegalStateException e) {
+            System.out.println("❌ Caught Expected Exception: " + e.getMessage());
         }
 
-        scanner.close();
+        // Scenario 2: Valid Train (Standard Operation)
+        List<String> activeConsist = new ArrayList<>();
+        activeConsist.add("BG101");
+        activeConsist.add("BG205");
+        activeConsist.add("BG309");
+
+        System.out.println("\nScenario 2: Searching a valid train consist...");
+        try {
+            boolean found = performSearch(activeConsist, "BG205");
+            System.out.println("✔ Search Execution: Bogie found = " + found);
+        } catch (IllegalStateException e) {
+            System.out.println("❌ Error: " + e.getMessage());
+        }
+
+        System.out.println("-----------------------------------------------------");
     }
 
     /**
-     * Optimized Binary Search implementation for String IDs
+     * Searches for a bogie ID but validates system state first.
+     * @throws IllegalStateException if the consist is empty.
      */
-    public static int binarySearch(String[] array, String key) {
-        int low = 0;
-        int high = array.length - 1;
-
-        while (low <= high) {
-            // Find the middle point
-            int mid = low + (high - low) / 2;
-
-            // Compare the key with the middle element
-            int comparison = key.compareTo(array[mid]);
-
-            if (comparison == 0) {
-                return mid; // Match found!
-            }
-            else if (comparison > 0) {
-                low = mid + 1; // Key is in the right half
-            }
-            else {
-                high = mid - 1; // Key is in the left half
-            }
+    public static boolean performSearch(List<String> bogies, String searchKey) {
+        // 1. State Validation (Defensive Check)
+        if (bogies == null || bogies.isEmpty()) {
+            throw new IllegalStateException("Search Failed: No bogies present in the train formation.");
         }
-        return -1; // Exhausted search range without a match
+
+        // 2. Logic execution (only if state is valid)
+        // Using a simple linear search for demonstration
+        return bogies.contains(searchKey);
     }
 }
