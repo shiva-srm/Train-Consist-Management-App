@@ -1,58 +1,50 @@
-import java.util.*;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TrainConsistApp {
 
-    // Inner Bogie class
-    static class Bogie {
-        private String type;
-        private String name;
-        private int capacity;
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
-        public Bogie(String type, String name, int capacity) {
-            this.type = type;
-            this.name = name;
-            this.capacity = capacity;
-        }
+        // Define Regex Patterns
+        // TRN- followed by exactly 4 digits
+        String trainIdRegex = "TRN-\\d{4}";
+        // PET- followed by exactly 2 uppercase letters
+        String cargoCodeRegex = "PET-[A-Z]{2}";
 
-        public String getType() {
-            return type;
-        }
+        System.out.println("--- Train Consist Management System: UC11 (Regex Validation) ---");
 
-        public String getName() {
-            return name;
-        }
+        // 1. Train ID Validation
+        System.out.print("Enter Train ID (Format: TRN-1234): ");
+        String trainIdInput = scanner.nextLine();
+        validateInput("Train ID", trainIdInput, trainIdRegex);
 
-        public int getCapacity() {
-            return capacity;
-        }
+        // 2. Cargo Code Validation
+        System.out.print("Enter Cargo Code (Format: PET-AB): ");
+        String cargoCodeInput = scanner.nextLine();
+        validateInput("Cargo Code", cargoCodeInput, cargoCodeRegex);
 
-        @Override
-        public String toString() {
-            return name + " (" + type + ") - Capacity: " + capacity;
-        }
+        System.out.println("-------------------------------------------------------------");
+        scanner.close();
     }
 
-    public static void main(String[] args) {
+    /**
+     * Helper method to validate input against a regex pattern
+     */
+    public static void validateInput(String fieldName, String input, String regex) {
+        // Compile the regex pattern
+        Pattern pattern = Pattern.compile(regex);
 
-        // Step 1: Create list of bogies
-        List<Bogie> bogies = new ArrayList<>();
-        bogies.add(new Bogie("Passenger", "Sleeper", 72));
-        bogies.add(new Bogie("Passenger", "AC Chair", 60));
-        bogies.add(new Bogie("Passenger", "Sleeper", 72));
-        bogies.add(new Bogie("Passenger", "First Class", 24));
-        bogies.add(new Bogie("Goods", "Cylindrical", 0));
-        bogies.add(new Bogie("Goods", "Rectangular", 0));
+        // Create a matcher for the specific input
+        Matcher matcher = pattern.matcher(input);
 
-        // Step 2: Use Stream -> map -> reduce
-        int totalSeats = bogies.stream()
-                .map(b -> b.getCapacity())   // Extract capacity
-                .reduce(0, Integer::sum);   // Sum all values
-
-        // Step 3: Display total seating capacity
-        System.out.println("=== Total Train Seating Capacity ===");
-        System.out.println("Total Seats: " + totalSeats);
-
-        // Step 4: Verify original list unchanged
-        System.out.println("\nOriginal List Size: " + bogies.size());
+        // Check if the entire input matches the pattern
+        if (matcher.matches()) {
+            System.out.println("✔ [SUCCESS] " + fieldName + " '" + input + "' is valid.");
+        } else {
+            System.out.println("❌ [ERROR] " + fieldName + " '" + input + "' is invalid.");
+            System.out.println("   Rule: Must follow the pattern: " + regex);
+        }
     }
 }
